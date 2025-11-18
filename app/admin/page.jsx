@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { db, storage } from "../components/lib/firebase.js";
+import { db, storage } from "@/lib/firebase"; // ✅ CORRECTO
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
