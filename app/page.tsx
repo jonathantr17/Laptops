@@ -1,74 +1,218 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
+
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Carousel from "./components/Carousel";
 import Footer from "./components/Footer";
 import ProductSection from "./components/ProductSection";
-import { FaCheckCircle, FaShippingFast, FaHeadset } from "react-icons/fa";
-
-// Datos de ejemplo
-const ofertas = [
-  { id: "o1", name: "Dell Inspiron 15", price: 399, image: "/images/laptop1.png" },
-  { id: "o2", name: "MacBook Air M1", price: 899, image: "/images/laptop1.png" },
-  { id: "o3", name: "HP Pavilion", price: 549, image: "/images/laptop1.png" },
-];
-
-const productos = [
-  { id: "l1", name: "Lenovo IdeaPad 3", specs: "Intel i5 · 8GB · 512GB", price: 439, image: "/images/laptop1.png" },
-  { id: "l2", name: "HP 14-DQ", specs: "Intel i3 · 8GB · 256GB", price: 379, image: "/images/laptop1.png", offer: "10% OFF" },
-  { id: "l3", name: "Asus TUF Gaming", specs: "AMD Ryzen 7 · 16GB · 1TB", price: 1099, image: "/images/laptop1.png" },
-  { id: "l4", name: "MacBook Air M2", specs: "M2 · 8GB · 256GB", price: 1199, image: "/images/laptop1.png", offer: "Nuevo" },
-  { id: "l5", name: "Acer Aspire 5", specs: "Intel i7 · 12GB · 1TB", price: 899, image: "/images/laptop1.png" },
-  { id: "l6", name: "HP Victus", specs: "Ryzen 5 · 16GB · 512GB", price: 799, image: "/images/laptop1.png" },
-];
+import { FaCheckCircle, FaShippingFast, FaHeadset, FaGift } from "react-icons/fa";
 
 export default function Home() {
+  const [productosDestacados, setProductosDestacados] = useState<any[]>([]);
+  const [ofertas, setOfertas] = useState<any[]>([]);
+  const [catalogo, setCatalogo] = useState<any>(null);
+
+  // 🔥 Cargar datos desde Firebase
+  useEffect(() => {
+    async function load() {
+      // Cargar productos destacados
+      const q = query(collection(db, "products"), where("destacado", "==", true));
+      const snap = await getDocs(q);
+
+      setProductosDestacados(
+        snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      );
+    }
+
+    async function loadOffers() {
+      // Cargar todas las ofertas
+      const snap = await getDocs(collection(db, "offers"));
+      setOfertas(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    }
+
+    async function loadCatalog() {
+      // Cargar catálogo especial
+      const snap = await getDocs(collection(db, "catalog"));
+      if (snap.docs.length > 0) {
+        setCatalogo({ id: snap.docs[0].id, ...snap.docs[0].data() });
+      }
+    }
+
+    load();
+    loadOffers();
+    loadCatalog();
+  }, []);
+
+  // Seleccionar la primera oferta como la principal destacada
+  const mainOffer = ofertas.length > 0 ? ofertas[0] : null;
+  // Las ofertas restantes para el carrusel/grid secundario
+  const secondaryOffers = ofertas.slice(1);
+
+  // Configuración de WhatsApp
+  const whatsappNumber = '593963351521';
+  const whatsappText = mainOffer
+    ? encodeURIComponent(`Hola, estoy interesado en la Mega Oferta del Día: ${mainOffer.title}`)
+    : "Hola, estoy interesado en una de sus ofertas especiales.";
+
+
   return (
-    <div>
+    // ✅ CORRECCIÓN 1: Agregar pt-16 al div principal para evitar que el navbar cubra el contenido.
+    <div className="pt-16"> 
       <Navbar />
-      <Hero />
+      
+{/* 🏞️ HERO CON SU PROPIA IMAGEN */}
+<Hero />
 
       <main className="max-w-7xl mx-auto px-6 py-12 space-y-20">
+{/* 🚨 OFERTAS ESPECIALES - Diseño con botón Índigo (Morado) */}
+{mainOffer && (
+  <section className="bg-white py-8 md:py-12 rounded-2xl shadow-2xl animate-fade-in"> 
+    
+    {/* Título más pequeño en móvil */}
+    <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-6 md:mb-10 text-center text-gray-700 flex justify-center items-center space-x-2 md:space-x-3">
+        <span>Ofertas Especiales</span>
+    </h2>
 
-        {/* 🔥 Ofertas especiales */}
-        <section>
-          <h2 className="text-3xl font-bold mb-8 text-center text-red-600">Ofertas especiales</h2>
-          <Carousel items={ofertas} />
-        </section>
+    <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10 max-w-6xl mx-auto px-4">
+      
+      {/* ⬅️ Imagen a la Izquierda - Relación de aspecto optimizada */}
+      <div className="md:w-1/2 flex-shrink-0 relative w-full"> 
+        <img
+          src={mainOffer.imageUrl}
+          alt={mainOffer.title}
+          className="w-full h-auto aspect-[3/2] md:aspect-video md:h-96 object-cover rounded-xl shadow-xl border-4 border-white transform hover:scale-[1.01] transition duration-500 ease-in-out"
+        />
+        {/* Etiqueta de Descuento en la imagen */}
+        <div className="absolute top-3 left-3 bg-red-600 text-white font-black text-sm md:text-lg py-1 px-3 md:py-2 md:px-5 rounded-full shadow-lg transform rotate-[-5deg]">
+            ¡-{Math.round(((mainOffer.priceBefore - mainOffer.priceAfter) / mainOffer.priceBefore) * 100)}% Dcto!
+        </div>
+      </div>
 
-        {/* 💻 Sección de productos moderna */}
-        <section id="productos">
-          <ProductSection title="Nuestros Productos" products={productos} />
-        </section>
+      {/* ➡️ Contenido a la Derecha */}
+      <div className="md:w-1/2 flex flex-col justify-center text-center md:text-left">
+        {/* Título de Producto más pequeño en móvil */}
+        <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-2 md:mb-4 leading-tight">
+          {mainOffer.title}
+        </h3>
+        <p className="text-sm md:text-lg text-gray-700 mb-4 md:mb-6 max-w-prose mx-auto md:mx-0 line-clamp-2">
+          {mainOffer.description}
+        </p>
 
-        {/* ⭐ Catálogo Especial */}
-        <section className="max-w-7xl mx-auto px-6 py-12">
-          <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Catálogo Especial</h2>
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="md:w-1/2">
-              <img 
-                src="/images/laptop1.png" 
-                alt="Promoción Especial" 
-                className="w-full h-64 object-cover rounded-lg shadow-lg"
-              />
-            </div>
-            <div className="md:w-1/2 flex flex-col justify-center">
-              <h3 className="text-2xl font-semibold mb-4">Promoción Especial de Temporada</h3>
-              <p className="text-gray-600 mb-6">
-                Aprovecha nuestra oferta exclusiva de laptops con los mejores precios y garantía de calidad.
-              </p>
-              <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow transition transform hover:-translate-y-1 hover:scale-105">
-                Ver Promoción
-              </button>
-            </div>
+        <div className="flex flex-col sm:flex-row items-center md:justify-start justify-center gap-2 md:gap-4 mb-6 md:mb-8">
+          <div className="text-xs md:text-sm text-gray-500 line-through">
+            Antes: <span className="font-semibold">${mainOffer.priceBefore}</span>
           </div>
-        </section>
+          {/* Precio "Ahora" más pequeño en móvil */}
+          <div className="text-3xl md:text-4xl font-extrabold text-red-700">
+            ¡Ahora: <span className="font-black">${mainOffer.priceAfter}</span>!
+          </div>
+        </div>
+
+        {/* BOTÓN DE ACCIÓN CORREGIDO: Usando indigo-600 y sombra/transición moderna */}
+        <a
+          href={`https://wa.me/${whatsappNumber}?text=${whatsappText}`}
+          target="_blank"
+          className="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-3 px-8 md:py-4 md:px-10 rounded-full 
+                     shadow-2xl hover:shadow-indigo-500/50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 
+                     inline-block self-center md:self-start text-base md:text-lg tracking-wide max-w-xs sm:max-w-none mx-auto md:mx-0"
+        >
+          ¡Aprovechar Ahora!
+        </a>
+      </div>
+    </div>
+
+    {/* Carrusel para otras ofertas - Más compacto en móvil */}
+    {secondaryOffers.length > 0 && (
+      <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-gray-200 px-4">
+        <h3 className="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6 md:mb-8">Más Ofertas Destacadas</h3>
+        <Carousel
+          items={secondaryOffers.map((o) => ({
+            id: o.id,
+            name: o.title,
+            description: o.description,
+            priceBefore: o.priceBefore,
+            price: o.priceAfter,
+            image: o.imageUrl,
+          }))}
+        />
+      </div>
+    )}
+  </section>
+)}
+       
+        {/* ⭐ Mostrar SOLO productos destacados */}
+        {/* ✅ CORRECCIÓN 2: Asegurar que el título del producto se pase correctamente */}
+        <ProductSection
+          title="Nuestros Productos"
+          products={productosDestacados.map((p) => ({
+            ...p,
+            name: p.title || p.name,     
+            title: p.title || p.name, 
+            image: p.image || p.imageUrl,
+            imageUrl: p.imageUrl || p.image,
+          }))}
+        />
+
+{/* ⭐ Catálogo Especial */}
+{catalogo && (
+  <section className="max-w-7xl mx-auto px-6 py-16">
+    
+    <h2 className="text-4xl font-bold mb-12 text-center text-gray-900 tracking-tight">
+      Catálogo Especial
+    </h2>
+
+    <div className="flex flex-col md:flex-row items-start gap-12 bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-100">
+
+      {/* 📘 Imagen del catálogo */}
+      <div className="md:w-1/2 w-full">
+        <img
+          src={catalogo.imageUrl}
+          alt="Catálogo"
+          className="w-full h-72 md:h-80 object-cover rounded-xl shadow-lg hover:shadow-2xl transition duration-300"
+        />
+      </div>
+
+      {/* 📕 Información */}
+      <div className="md:w-1/2 w-full flex flex-col justify-start">
+        
+        {/* Subtítulo alineado arriba */}
+        <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+          {catalogo.titulo || "Catálogo Especial"}
+        </h3>
+
+        <p className="text-gray-600 mb-8 leading-relaxed text-base md:text-lg">
+          {catalogo.descripcion ||
+            "Explora nuestro catálogo completo con las mejores laptops del mercado."}
+        </p>
+
+        {/* Botón de acción (WhatsApp) */}
+        <a
+          href="https://wa.me/593963351521?text=Hola%20quiero%20ver%20el%20catálogo%20completo"
+          target="_blank"
+          className="self-start bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-full shadow-md transition transform hover:-translate-y-1 hover:scale-105 text-sm md:text-base flex items-center gap-2"
+        >
+          <img src="/whatsapp.png" className="w-8 h-8" alt="WhatsApp" />
+          Ver en WhatsApp
+        </a>
+      </div>
+
+    </div>
+  </section>
+)}
+
+        
 
         {/* 🧭 Sobre Nosotros */}
         <section className="bg-gray-100 py-16">
           <div className="max-w-7xl mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">Sobre Nosotros</h2>
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">
+              Sobre Nosotros
+            </h2>
             <p className="text-gray-600 max-w-3xl mx-auto mb-12">
               En <span className="font-semibold text-green-600">LaptopX</span> nos dedicamos a ofrecer las mejores laptops del mercado a precios accesibles. 
               Nuestra misión es brindar a nuestros clientes productos de calidad, atención personalizada y 

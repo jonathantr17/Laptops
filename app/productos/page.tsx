@@ -60,17 +60,25 @@ export default function ProductosPage() {
   }));
 
   return (
-    <div className="pt-20">
+    <div className="pt-20 bg-gray-50 min-h-screen"> {/* Agregamos un fondo sutil */}
       <Navbar />
-      <main className="max-w-7xl mx-auto px-6 py-12 space-y-12">
-        <h1 className="text-4xl font-bold text-center text-green-600 mb-10">
-          Catálogo de Productos
+      <main className="max-w-7xl mx-auto px-6 py-16 space-y-16">
+
+        {/* CAMBIO: text-indigo-600 y estilo más impactante */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-indigo-600 mb-0 tracking-tight">
+          Nuestros productos
         </h1>
 
         {loading ? (
-          <p className="text-center text-gray-500">Cargando productos...</p>
+          // Mejora visual del estado de carga
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            <p className="ml-4 text-lg text-gray-600">Cargando productos...</p>
+          </div>
         ) : formattedProducts.length === 0 ? (
-          <p className="text-center text-gray-500">No hay productos disponibles</p>
+          <p className="text-center text-lg text-gray-500 py-20">
+            Aún no hay productos disponibles en el catálogo.
+          </p>
         ) : (
           <ProductSection title="" products={formattedProducts} />
         )}
