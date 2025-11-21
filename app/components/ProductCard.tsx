@@ -1,10 +1,23 @@
+"use client";
+
 import { useState } from "react";
-import { FaArrowRight, FaWhatsapp, FaTimes } from "react-icons/fa"; // Importamos FaTimes para cerrar modal
+import { FaArrowRight, FaWhatsapp, FaTimes } from "react-icons/fa"; 
 
-const WHATSAPP_NUMBER = '593963351521'; // Número de WhatsApp
+const WHATSAPP_NUMBER = '593963351521'; 
 
-// Componente para el Modal de Detalles
-const DetailsModal = ({ laptop, onClose }) => {
+// 1. DEFINIR INTERFAZ DE LAPTOP (Añadida para tipado)
+interface Laptop {
+    id: string; // Asumimos que hay un ID
+    name: string;
+    price: number; 
+    image: string;
+    specs?: string;
+    description?: string;
+}
+
+// 2. TIPAR DetailsModal
+// El error se produce aquí porque TypeScript no sabe el tipo de { laptop, onClose }
+const DetailsModal = ({ laptop, onClose }: { laptop: Laptop, onClose: () => void }) => {
     // Texto de WhatsApp para el botón "Comprar"
     const whatsappText = encodeURIComponent(`Hola, estoy interesado en el producto "${laptop.name}" que tiene un precio de $${laptop.price}.`);
 
@@ -12,11 +25,11 @@ const DetailsModal = ({ laptop, onClose }) => {
         // Overlay y contenedor del modal
         <div 
             className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn"
-            onClick={onClose} // Cierra al hacer clic fuera
+            onClick={onClose}
         >
             <div 
                 className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 animate-scaleUp"
-                onClick={(e) => e.stopPropagation()} // Evita que el clic dentro cierre el modal
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* Botón de cerrar */}
                 <button
@@ -51,7 +64,6 @@ const DetailsModal = ({ laptop, onClose }) => {
                         {/* Especificaciones */}
                         <div className="space-y-3">
                             <h3 className="text-xl font-bold text-gray-800">Especificaciones:</h3>
-                            {/* Puedes asumir que laptop.specs es un string con saltos de línea o lista */}
                             <p className="text-gray-700 text-base whitespace-pre-line">
                                 {laptop.specs || "Especificaciones detalladas no disponibles."}
                             </p>
@@ -70,6 +82,7 @@ const DetailsModal = ({ laptop, onClose }) => {
                                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                // Nota: Usé green-600 para el botón de WhatsApp por convención
                                 className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-[1.01]"
                             >
                                 <FaWhatsapp className="w-6 h-6"/>
@@ -91,7 +104,8 @@ const DetailsModal = ({ laptop, onClose }) => {
 
 
 // Componente Principal: ProductCard
-export default function ProductCard({ laptop }: { laptop: any }) {
+// 3. TIPAR ProductCard (Reemplazando 'any' con 'Laptop')
+export default function ProductCard({ laptop }: { laptop: Laptop }) {
   const [showDetails, setShowDetails] = useState(false);
 
   // Generar texto para el botón de WhatsApp
@@ -144,7 +158,7 @@ export default function ProductCard({ laptop }: { laptop: any }) {
             {/* Botón "Ver Detalle" que abre el modal */}
             <button
               className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-3 rounded-xl transition-all duration-300 transform hover:scale-[1.03] shadow-md"
-              onClick={() => setShowDetails(true)} // Cambiamos a true para mostrar el modal
+              onClick={() => setShowDetails(true)}
             >
               Ver detalle
               <FaArrowRight className="ml-2" />
