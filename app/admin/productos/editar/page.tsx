@@ -2,23 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-// Importamos 'doc', 'getDoc', y 'updateDoc' con sus tipos
 import { doc, getDoc, updateDoc } from "firebase/firestore"; 
 import { db, storage } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-// Definimos la estructura de datos para mejor tipado
 interface ProductData {
   title: string;
   specs: string;
-  // Usamos string para el input y lo convertiremos a number al guardar
   price: string; 
   imageUrl: string;
 }
 
 export default function EditarProducto() {
   const params = useSearchParams();
-  // id puede ser string | null, lo manejamos en useEffect y save
   const id = params.get("id"); 
 
   const [data, setData] = useState<ProductData>({
@@ -30,25 +26,28 @@ export default function EditarProducto() {
 
   const [image, setImage] = useState<File | null>(null);
   const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState(true); // Nuevo estado para la carga inicial
+  const [loading, setLoading] = useState(true); 
 
   // Cargar datos del producto
   useEffect(() => {
-    // Verificamos si el ID no es null antes de llamar a Firestore
+    // 1. Verificamos y definimos una variable local tipada
     if (!id) {
       setLoading(false);
       return;
     }
 
+    // Usamos el ID verificado para definir la función asíncrona
+    // TypeScript ahora sabe que el 'id' dentro de load() es un string.
     async function load() {
       try {
-        const snap = await getDoc(doc(db, "products", id));
+        // LÍNEA CRÍTICA: 'id' ya fue chequeado arriba
+        const snap = await getDoc(doc(db, "products", id!));
+        
         if (snap.exists()) {
-          // Aseguramos que price se guarde como string para el input
           const productData = snap.data();
           setData({
             ...productData,
-            price: String(productData.price), // Convertimos el número a string para el input
+            price: String(productData.price), 
           } as ProductData);
         }
       } catch (error) {
@@ -90,14 +89,13 @@ export default function EditarProducto() {
         setMsg("Imagen subida. Guardando datos...");
       }
 
-      // Convertimos el precio a float (número) antes de guardar en Firestore
       const newPrice = parseFloat(data.price); 
 
       // Guardar actualizaciones en Firestore
-      await updateDoc(doc(db, "products", id), { // Ya no necesitamos 'id!'
+      // LÍNEA CRÍTICA: 'id' ya fue chequeado arriba.
+      await updateDoc(doc(db, "products", id), { 
         title: data.title,
         specs: data.specs,
-        // Usamos newPrice, asegurando que sea un número. Si es NaN, usamos 0.
         price: isNaN(newPrice) ? 0 : newPrice, 
         imageUrl,
       });
@@ -157,7 +155,6 @@ export default function EditarProducto() {
             <label className="block text-gray-700 font-medium mb-1">Precio ($)</label>
             <input
               type="number"
-              // Usamos un patrón regex simple para asegurar números decimales positivos
               pattern="[0-9]+([\.,][0-9]+)?" 
               step="0.01"
               value={data.price}
