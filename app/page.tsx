@@ -126,22 +126,32 @@ export default function Home() {
       </div>
     </div>
 
-    {/* Carrusel para otras ofertas - Más compacto en móvil */}
-    {secondaryOffers.length > 0 && (
-      <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-gray-200 px-4">
-        <h3 className="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6 md:mb-8">Más Ofertas Destacadas</h3>
-        <Carousel
-          items={secondaryOffers.map((o) => ({
-            id: o.id,
-            name: o.title,
-            description: o.description,
-            priceBefore: o.priceBefore,
-            price: o.priceAfter,
-            image: o.imageUrl,
-          }))}
-        />
-      </div>
-    )}
+   {/* Carrusel para otras ofertas - Más compacto en móvil */}
+            {secondaryOffers.length > 0 && (
+              <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-gray-200 px-4">
+                <h3 className="text-xl md:text-2xl font-bold text-center text-gray-800 mb-6 md:mb-8">Más Ofertas Destacadas</h3>
+                <Carousel
+                  // CORRECCIÓN CLAVE: Ajustar las propiedades mapeadas
+                  items={secondaryOffers.map((o) => ({
+                    id: o.id,
+                    // Usar 'title' para 'title'
+                    title: o.title, 
+                    // Usar 'name' o 'title' si el carrusel lo necesita por compatibilidad, pero el error pide 'title'
+                    name: o.title, 
+                    description: o.description,
+
+                    // Usar 'priceBefore' para mantener esa información (si el componente Carousel lo admite)
+                    priceBefore: o.priceBefore, 
+                    
+                    // Usar 'priceAfter' en lugar de 'price'
+                    priceAfter: o.priceAfter, 
+                    
+                    // Usar 'imageUrl' en lugar de 'image'
+                    imageUrl: o.imageUrl,
+                  }))}
+                />
+              </div>
+            )}
   </section>
 )}
        
