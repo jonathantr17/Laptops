@@ -1,14 +1,24 @@
 "use client";
 
 import { useState } from "react";
+// 1. IMPORTAR REACT para tipos de eventos
+import React from 'react'; 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaTelegram } from "react-icons/fa";
 import { HiOutlineChatAlt2 } from "react-icons/hi"; 
 import { FiSend } from "react-icons/fi"; 
 
+// Definir la estructura de datos para mejor tipado (ayuda a TS)
+interface FormData {
+    nombre: string;
+    email: string;
+    telefono: string;
+    mensaje: string;
+}
+
 export default function ContactoPage() {
-    const [formData, setFormData] = useState({ 
+    const [formData, setFormData] = useState<FormData>({ 
         nombre: "", 
         email: "", 
         telefono: "", 
@@ -17,12 +27,14 @@ export default function ContactoPage() {
     const [enviado, setEnviado] = useState(false);
     const [loading, setLoading] = useState(false); 
 
-    const handleChange = (e) => {
+    // 2. CORRECCIÓN: Tipado de handleChange
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e) => {
+    // 3. CORRECCIÓN: Tipado de handleSubmit
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
 
@@ -37,7 +49,8 @@ export default function ContactoPage() {
         setFormData({ nombre: "", email: "", telefono: "", mensaje: "" });
     };
 
-    // CORRECCIÓN: El comentario de la línea 42 se movió aquí.
+    // ... (El comentario sobre la línea 42 se ignora al ser JSX)
+
     return (
         <div className="bg-gray-50 min-h-screen">
             <Navbar />
@@ -78,7 +91,7 @@ export default function ContactoPage() {
                                     onChange={handleChange}
                                     required
                                     placeholder="Tu nombre completo"
-                                    className="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300"
+                                    className="w-full p-3 border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300"
                                 />
                             </div>
 
@@ -92,7 +105,7 @@ export default function ContactoPage() {
                                     onChange={handleChange}
                                     required
                                     placeholder="ejemplo@correo.com"
-                                    className="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300"
+                                    className="w-full p-3 border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300"
                                 />
                             </div>
 
@@ -105,7 +118,7 @@ export default function ContactoPage() {
                                     value={formData.telefono}
                                     onChange={handleChange}
                                     placeholder="+593 9..."
-                                    className="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300"
+                                    className="w-full p-3 border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300"
                                 />
                             </div>
 
@@ -117,9 +130,9 @@ export default function ContactoPage() {
                                     value={formData.mensaje}
                                     onChange={handleChange}
                                     required
-                                    rows="5"
+                                    rows={5}
                                     placeholder="Describe tu solicitud o pregunta..."
-                                    className="w-full border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300 resize-none"
+                                    className="w-full p-3 border border-gray-300 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-300 resize-none"
                                 />
                             </div>
 
@@ -195,18 +208,21 @@ export default function ContactoPage() {
                         </div>
 
                         {/* Mapa Mejorado */}
-                        <div className="mt-8 rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15949.771120038936!2d-79.22723659999999!3d-0.9366453999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d547f48b9f1d85%3A0x6b772074d2e7b752!2sLa%20Man%C3%A1%2C%20Ecuador!5e0!3m2!1sen!2sus!4v1678896000000!5m2!1sen!2sus"
-                                width="100%"
-                                height="300"
-                                style={{ border: 0 }}
-                                allowFullScreen=""
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                aria-label="Ubicación de La Maná, Cotopaxi"
-                            ></iframe>
-                        </div>
+<div className="mt-8 rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+    <iframe
+        // CORRECCIÓN 1: La URL de tu código anterior (https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15949.771120038936!2d-79.22723659999999!3d-0.9366453999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d547f48b9f1d85%3A0x6b772074d2e7b752!2sLa%20Man%C3%A1%2C%20Ecuador!5e0!3m2!1sen!2sus!4v1678896000000!5m2!1sen!2sus) es INVÁLIDA.
+        // Usamos una URL de ejemplo de Google Maps Embed (necesitarás cambiar el 'embed' con tu ubicación real)
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15767.114516752765!2d-79.37941214041695!3d-0.9405615757973715!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d5757a4146c641%3A0x6a0535e6912301f2!2sLa%20Man%C3%A1!5e0!3m2!1ses-419!2sec!4v1700609000000!5m2!1ses-419!2sec"
+        width="100%"
+        height="300"
+        style={{ border: 0 }}
+        // CORRECCIÓN 2: Eliminamos las comillas vacías. Solo se pone el atributo.
+        allowFullScreen 
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        aria-label="Ubicación de La Maná, Cotopaxi"
+    ></iframe>
+</div>
                     </div>
                 </div>
             </main>
@@ -216,9 +232,17 @@ export default function ContactoPage() {
     );
 }
 
+// Interfaz para ContactItem
+interface ContactItemProps {
+    Icon: React.ElementType;
+    title: string;
+    value: string;
+    color: string;
+    link?: string;
+}
 
-// --- Componente auxiliar para mejorar la estética de los ítems de contacto ---
-const ContactItem = ({ Icon, title, value, color, link }) => (
+// 4. CORRECCIÓN: Tipado de ContactItem
+const ContactItem = ({ Icon, title, value, color, link }: ContactItemProps) => (
     <div className="flex items-center gap-4 group">
         <div className={`p-3 rounded-full ${color} bg-opacity-10 transition duration-300 group-hover:bg-opacity-20`}>
             <Icon className={`text-2xl ${color}`} />
@@ -231,7 +255,9 @@ const ContactItem = ({ Icon, title, value, color, link }) => (
                     href={link} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className={`text-indigo-600 hover:text-indigo-800 font-medium transition duration-300 underline-offset-4 ${color}`}
+                    // Nota: Aquí se usa text-indigo-600 para los enlaces, pero el color primario
+                    // del ContactItem es definido por la prop `color`.
+                    className={`text-indigo-600 hover:text-indigo-800 font-medium transition duration-300 underline-offset-4`}
                 >
                     {value}
                 </a>
