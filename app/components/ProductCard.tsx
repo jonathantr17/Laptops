@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FaArrowRight, FaWhatsapp, FaTimes } from "react-icons/fa"; 
+import { FaArrowRight, FaWhatsapp, FaTimes, FaMemory, FaHdd } from "react-icons/fa"; 
 
 const WHATSAPP_NUMBER = '593963351521'; 
 
-// 1. DEFINIR INTERFAZ DE LAPTOP (Añadida para tipado)
 interface Laptop {
-    id: string; // Asumimos que hay un ID
+    id: string;
     name: string;
     price: number; 
     image: string;
@@ -15,86 +14,64 @@ interface Laptop {
     description?: string;
 }
 
-// 2. TIPAR DetailsModal
-// El error se produce aquí porque TypeScript no sabe el tipo de { laptop, onClose }
+// 1. MODAL REDISEÑADO (ESTILO DARK)
 const DetailsModal = ({ laptop, onClose }: { laptop: Laptop, onClose: () => void }) => {
-    // Texto de WhatsApp para el botón "Comprar"
-    const whatsappText = encodeURIComponent(`Hola, estoy interesado en el producto "${laptop.name}" que tiene un precio de $${laptop.price}.`);
+    const whatsappText = encodeURIComponent(`Hola LaptopX, me interesa la "${laptop.name}" ($${laptop.price}). ¿Tienen stock disponible?`);
 
     return (
-        // Overlay y contenedor del modal
         <div 
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn"
+            className="fixed inset-0 z-[100] bg-gray-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300"
             onClick={onClose}
         >
             <div 
-                className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 animate-scaleUp"
+                className="bg-gray-900 border border-white/10 rounded-[2.5rem] w-full max-w-5xl max-h-[90vh] overflow-hidden relative shadow-[0_0_50px_rgba(79,70,229,0.15)] flex flex-col md:flex-row animate-in zoom-in-95 duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Botón de cerrar */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-700 hover:text-gray-900 bg-white/80 p-2 rounded-full shadow-lg transition z-50"
-                >
-                    <FaTimes className="w-5 h-5" />
+                {/* Botón Cerrar */}
+                <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-white z-50 bg-white/5 p-2 rounded-full transition-colors">
+                    <FaTimes size={20} />
                 </button>
 
-                {/* Contenido del Modal (Imagen y Detalles) */}
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                    
-                    {/* ⬅️ Lado Izquierdo: Imagen */}
-                    <div className="md:h-full p-4 md:p-6 flex items-center justify-center bg-gray-50 rounded-l-3xl">
-                         <img
-                            src={laptop.image}
-                            alt={laptop.name}
-                            className="w-full max-h-[50vh] md:max-h-full object-contain rounded-xl shadow-lg"
-                        />
+                {/* 🖼️ Lado Izquierdo: Galería/Imagen */}
+                <div className="md:w-1/2 bg-gray-950/50 p-8 flex items-center justify-center border-r border-white/5">
+                    <img src={laptop.image} alt={laptop.name} className="w-full h-auto object-contain max-h-[40vh] md:max-h-full drop-shadow-[0_0_30px_rgba(79,70,229,0.2)]" />
+                </div>
+                
+                {/* ➡️ Lado Derecho: Info */}
+                <div className="md:w-1/2 p-8 md:p-12 overflow-y-auto space-y-8">
+                    <div className="space-y-2">
+                        <span className="text-indigo-500 font-black text-xs uppercase tracking-[0.3em]">Laptop de Alto Nivel</span>
+                        <h2 className="text-3xl md:text-4xl font-black text-white leading-tight tracking-tighter">{laptop.name}</h2>
+                    </div>
+
+                    <div className="text-4xl font-black text-indigo-500 tracking-tighter">
+                        ${laptop.price}
+                    </div>
+
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Especificaciones Técnicas
+                        </h3>
+                        <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
+                            <p className="text-gray-300 text-base leading-relaxed whitespace-pre-line font-medium">
+                                {laptop.specs || "Contacta para specs detalladas."}
+                            </p>
+                        </div>
                     </div>
                     
-                    {/* ➡️ Lado Derecho: Detalles y Acciones */}
-                    <div className="p-6 md:p-8 space-y-5">
-                        <h2 className="text-3xl font-extrabold text-gray-900 leading-tight border-b pb-3">{laptop.name}</h2>
-                        
-                        {/* Precio */}
-                        <div className="flex justify-between items-center text-3xl font-black text-indigo-600">
-                            <span>Precio:</span>
-                            <span>${laptop.price}</span>
-                        </div>
-
-                        {/* Especificaciones */}
-                        <div className="space-y-3">
-                            <h3 className="text-xl font-bold text-gray-800">Especificaciones:</h3>
-                            <p className="text-gray-700 text-base whitespace-pre-line">
-                                {laptop.specs || "Especificaciones detalladas no disponibles."}
-                            </p>
-                            
-                            {/* Si tienes un campo de descripción detallado: */}
-                            {laptop.description && (
-                                <p className="text-gray-600 text-sm italic pt-3 border-t">
-                                    {laptop.description}
-                                </p>
-                            )}
-                        </div>
-                        
-                        {/* Botones de Acción */}
-                        <div className="pt-6 flex flex-col gap-4 border-t">
-                            <a
-                                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                // Nota: Usé green-600 para el botón de WhatsApp por convención
-                                className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow-lg transition transform hover:scale-[1.01]"
-                            >
-                                <FaWhatsapp className="w-6 h-6"/>
-                                Comprar por WhatsApp
-                            </a>
-                            <button
-                                onClick={onClose}
-                                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-xl transition"
-                            >
-                                Seguir Navegando
-                            </button>
-                        </div>
+                    <div className="flex flex-col gap-4 pt-4">
+                        <a
+                            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-2xl shadow-lg shadow-indigo-600/20 transition-all active:scale-95 text-lg"
+                        >
+                            <FaWhatsapp className="text-2xl"/>
+                            CONSULTAR POR WHATSAPP
+                        </a>
+                        <button onClick={onClose} className="w-full text-gray-500 hover:text-white font-bold py-2 transition-colors text-sm uppercase tracking-widest">
+                            Volver al catálogo
+                        </button>
                     </div>
                 </div>
             </div>
@@ -102,78 +79,61 @@ const DetailsModal = ({ laptop, onClose }: { laptop: Laptop, onClose: () => void
     );
 };
 
-
-// Componente Principal: ProductCard
-// 3. TIPAR ProductCard (Reemplazando 'any' con 'Laptop')
+// 2. PRODUCT CARD REDISEÑADA (ESTILO DARK)
 export default function ProductCard({ laptop }: { laptop: Laptop }) {
   const [showDetails, setShowDetails] = useState(false);
-
-  // Generar texto para el botón de WhatsApp
-  const whatsappTextShort = encodeURIComponent(`Hola, estoy interesado en saber más sobre la laptop "${laptop.name}".`);
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappTextShort}`;
+  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Info sobre ${laptop.name}`)}`;
 
   return (
     <>
-      {/* Tarjeta del Producto */}
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col group hover:shadow-2xl transition-all duration-300">
+      <div className="group bg-gray-900/40 border border-white/5 rounded-[2rem] overflow-hidden flex flex-col transition-all duration-500 hover:border-indigo-500/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
         
-        {/* 🖼️ Contenedor de Imagen y Elementos Absolutos */}
-        <div className="overflow-hidden relative">
-          
-          {/* Imagen con efecto hover */}
-          <img
-            src={laptop.image}
-            alt={laptop.name}
-            className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-
-          {/* Precio (Derecha Superior) */}
-          <div className="absolute top-3 right-3 bg-indigo-600 text-white font-black text-lg py-1 px-3 rounded-lg shadow-md">
+        <div className="relative p-6 h-64 flex items-center justify-center bg-gray-950/20 overflow-hidden">
+          {/* Badge de Precio Flotante */}
+          <div className="absolute top-5 left-5 z-10 bg-indigo-600 text-white font-black text-sm py-1.5 px-4 rounded-full shadow-lg">
              ${laptop.price}
           </div>
 
-          {/* Botón de WhatsApp (Izquierda Inferior, flotando) */}
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute bottom-3 left-3 bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg transition transform hover:scale-110"
-          >
-            <FaWhatsapp className="w-6 h-6" />
-          </a>
+          <img
+            src={laptop.image}
+            alt={laptop.name}
+            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-2xl"
+          />
+          
+          {/* Overlay al hacer hover */}
+          <div className="absolute inset-0 bg-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         </div>
 
-        {/* 📋 Información y Botones */}
-        <div className="p-4 flex flex-col flex-1 justify-between">
-          <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-2">{laptop.name}</h3>
+        <div className="p-8 flex flex-col flex-1">
+          <div className="flex-1 space-y-3">
+            <h3 className="text-xl font-black text-white line-clamp-1 tracking-tight group-hover:text-indigo-400 transition-colors">
+                {laptop.name}
+            </h3>
             
-            <p className="text-gray-600 text-sm line-clamp-3">
-              {laptop.specs || laptop.description || "Especificaciones clave no listadas."}
+            <p className="text-gray-500 text-sm line-clamp-2 font-medium leading-relaxed">
+              {laptop.specs || "Potencia garantizada para tus proyectos."}
             </p>
           </div>
 
-          <div className="mt-4 flex items-center justify-end">
-            
-            {/* Botón "Ver Detalle" que abre el modal */}
+          <div className="mt-8 flex items-center gap-3">
             <button
-              className="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-3 rounded-xl transition-all duration-300 transform hover:scale-[1.03] shadow-md"
               onClick={() => setShowDetails(true)}
+              className="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-xl transition-all border border-white/10 text-sm uppercase tracking-widest"
             >
-              Ver detalle
-              <FaArrowRight className="ml-2" />
+              Detalles
             </button>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white p-4 rounded-xl shadow-lg shadow-indigo-600/20 transition-all active:scale-90"
+            >
+              <FaWhatsapp size={20} />
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Renderizar Modal si showDetails es true */}
-      {showDetails && (
-        <DetailsModal 
-          laptop={laptop} 
-          onClose={() => setShowDetails(false)} 
-        />
-      )}
+      {showDetails && <DetailsModal laptop={laptop} onClose={() => setShowDetails(false)} />}
     </>
   );
 }
