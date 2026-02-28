@@ -1,12 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #080c10;
+  --foreground: #ededed;
 }
 
 html {
-  scroll-padding-top: 100px; /* Ajusta segÃƒÂºn el alto de tu navbar */
+  scroll-padding-top: 72px;
 }
 
 @theme inline {
@@ -16,16 +17,68 @@ html {
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  background: #080c10;
+  color: #ededed;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Custom keyframes used in Hero ─────────────────── */
+@keyframes floatY {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes slideRight {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 100%;
+  }
 }
 
+@keyframes pulseDot {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.65);
+  }
+}
+
+.animate-floatY {
+  animation: floatY 3s ease-in-out infinite;
+}
+
+.animate-floatY2 {
+  animation: floatY 4s ease-in-out 1.5s infinite;
+}
+
+.animate-slideRight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: #6366f1;
+  animation: slideRight 2s ease-in-out infinite;
+}
+
+.animate-pulseDot {
+  animation: pulseDot 2s ease infinite;
+}
